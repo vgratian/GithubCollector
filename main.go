@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-    registrar.RegisterCollector("Github", func() collector.Collector { return new(Github) })
+	registrar.RegisterCollector("Github", func() collector.Collector { return new(Github) })
 }
 
 type repoData struct {
