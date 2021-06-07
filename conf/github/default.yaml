@@ -1,0 +1,5 @@
+collector: Github
+object: repo
+
+schedule:
+  - data: 60s
