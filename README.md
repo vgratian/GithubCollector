@@ -2,35 +2,65 @@
 
 # Github
 
-Collects basic stats about a Github repo. This collector is mainly here to experiment with Harvest module architecture.
+Collects some basic stats about a Github repository, such as number of downloads, open issues, traffic, and number of lines of each file.
 
-## Target System
-Github
+This collector is mainly here to experiment with Harvest module architecture. I wanted to have a proof-of-concept that you can write a Harvest collector without touching the code base of main components.
 
-## Requirements
-Harvest with the [newly proposed module architecture](https://github.com/NetApp/harvest/tree/module-arch-improvement).
 
-Install collector:
+## Installing
 
-- add URL of this repository `/opt/harvest/modules.txt`
-- copy `conf/github/` to `/opt/harvest/conf`
-- run `make modules` and `make build`
+1. Clone this repo:
+
+```sh
+cd /opt
+git clone --depth 1 https://github.com/vgratian/GithubCollector
+ln -s /opt/GitHubCollector/cmd/collector/ /opt/harvest/cmd/collectors/github
+ln -s /opt/GitHubCollector/conf/github/ /opt/harvest/conf/github
+```
+
+2. Make harvest import this module:
+```
+cd /opt/harvest
+sed -i 's|"fmt"|"fmt"\n\t_ "goharvest2/cmd/collectors/github"|' cmd/poller/poller.go
+```
+
+2. Install dependencies and re-build Harvest:
+
+```sh
+cd /opt/harvest
+go mod tidy
+go mod vendor
+make build
+```
+
+*Congrats you installed a new collector!*
+
 
 ## Parameters
 
-| parameter              | type         | description                                      | default                |
-|------------------------|--------------|--------------------------------------------------|------------------------|
-| `add`                  | string       | URL of Github (`https://github.com`)             |                        |
-| `repos`     | list of strings | list of Github repositories with format `OWNER/REPO` (e.g. `NetApp/harvest`)  |   |
+| parameter  | type     | description                                      | 
+|------------|----------|--------------------------------------------------|
+| `addr`     | string       | Address of the repository (e.g. `https://github.com/NetApp/harvest`)   | 
+| `password` | string   | A Github [personal access token](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)     |
 
-## Metrics
+Next, to run the collector, define a new poller in your `harvest.yml` with these two parameters. Example: 
 
-Collects metrics using Guthub's REST APIs (list can be easily extended):
+```yaml
 
-| metric             | type                       | unit          | description                                              |
-|--------------------|----------------------------|---------------|----------------------------------------------------------|
-| `size`             | counter, `uint64`          | byte          | size of the repository                                   |
-| `stargazers_count` | counter, `uint64`          | count         | number of stars                                          |
-| `forks_count`      | counter, `uint64`          | count         | number of forks                                          |
-| `open_issues_count`| counter, `uint64`          | count         | number of open issues                                    |
-| `languages`        | histogram, `uint64`        | byte          | languages of the source-code                             |
+
+Pollers:
+  github:
+    addr: https://github.com/NetApp/harvest
+    password: ghp_sdffe%$^v6ub7b67RCERDWR$@
+    collectors:
+      - Github
+    exporters:
+      - prom
+
+```
+
+## Subtemplate and Metrics
+
+The Collector will run two polls:
+* `files`: provides to metrics: `repo_size_bytes` and `repo_size_lines`
+* `data`: provides metrics from the APIs defined in the `counters` section of the [conf/github/default.yaml](conf/github/default.yaml).

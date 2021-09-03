@@ -1,5 +1,44 @@
-collector: Github
+collector: GithubRepo
 object: repo
 
 schedule:
-  - data: 60s
+  #- data: 999h
+  - files: 1h
+
+intervals:
+  repo: 5m
+  clones: 5m
+  views: 5m
+
+counters:
+  => repo:
+    #- ^name             => repo
+    - ^pushed_at        => updated
+    - size
+    - stargazers_count  => stars
+    - watchers_count    => watchs
+    - forks_count       => forks
+    - network_count     => network
+    - subscribers_count => subs
+    - open_issues_count => open_issues
+  /traffic/clones => repo_clones:
+    - count
+    - uniques
+  /traffic/views => repo_views:
+    - count
+    - uniques
+  /traffic/popular/referrers => repo_referrers:
+    - ^^referrer
+    - count
+    - uniques
+  /releases => repo_releases:
+    - ^^id               => release_id
+    - ^^name             => release
+    - ^published_at     => date
+    assets:
+      - ^^id            => asset_id
+      - ^^name           => asset
+      - download_count  => downloads
+
+
+
