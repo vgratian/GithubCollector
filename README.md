@@ -1,6 +1,6 @@
 
 
-*** This was a POC collector for [Netapp's harvest](https://github.com/NetApp/harvest) and is probably not compatible with its current version anymore ***
+***This was a POC collector for [Netapp's harvest](https://github.com/NetApp/harvest) and is probably not compatible with its current version anymore***
 
 # Github
 
