@@ -1,5 +1,7 @@
 
 
+*** This was a POC collector for [Netapp's harvest](https://github.com/NetApp/harvest) and is probably not compatible with its current version anymore ***
+
 # Github
 
 Collects some basic stats about a Github repository, such as number of downloads, open issues, traffic, and number of lines of each file.
